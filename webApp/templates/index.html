@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>获奖人员单位匹配</title>
+    <style>
+        #buttons {
+            width: 100%;
+            position: relative;
+        }
+        .button-left {
+            position: absolute;
+            left: 0;
+        }
+        .button-middle {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+    <script>
+    function chooseUnit(unit) {
+        fetch('/update_unit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({unit: unit}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                document.getElementById('winner-name').innerText = data.winner;
+                document.getElementById('winner-index').innerText = "row index: " +data.row_index+", winner index: "+data.winner_index;
+                let buttons = '';
+                data.units.forEach(unit => {
+                    buttons += `<button onclick="chooseUnit('${unit}')">${unit}</button>`;
+                });
+                document.getElementById('buttons').innerHTML = buttons;
+                document.getElementById('info-left').innerHTML = data.info_left.results;
+                document.getElementById('info-right').innerHTML = data.info_right.results;
+            } else {
+                document.getElementById('winner-info').innerText = '所有获奖人处理完毕';
+                document.getElementById('buttons').style.display = 'none';
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+    </script>
+    <script>
+    // 将文本中的URL转换为可点击的链接
+    function linkify(text) {
+        var urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g;
+        return text.replace(urlRegex, function(url) {
+            var hyperlink = url;
+            if (!hyperlink.match('^https?:\/\/')) {
+                hyperlink = 'http://' + url;
+            }
+            return '<a href="' + hyperlink + '" target="_blank">' + url + '</a>';
+        });
+    }
+    </script>
+</head>
+<body>
+    <div id="winner-info">
+        <h3 id="winner-name">{{ data.winner }}</h3>
+        <h3 id="winner-index">row index: {{data.row_index}}, winner index: {{ data.winner_index }}</h3>
+        <div id="buttons">
+            {% for unit in data.units %}
+                {% if loop.first %}
+                    <button class="button-left" onclick="chooseUnit('{{ unit }}')" >{{ unit }}</button>
+                {% else %}
+                    <button class="button-middle" onclick="chooseUnit('{{ unit }}')">{{ unit }}</button>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div id="info-left" style="float:left; width: 50%;">
+            <p>{{  data.info_left.results |safe }}</p>
+        </div>
+        <div id="info-right" style="float:right; width: 50%;">
+            <p>{{  data.info_right.results | safe}}</p>
+        </div>
+    </div>
+</body>
+</html>
