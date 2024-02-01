@@ -1,8 +1,8 @@
 import requests
 import json
 
-api_key = "AIzaSyBqcbkoaQy6WVBpg12rI3G826LqcqF8cuw"  # 替换为你的API密钥
-cse_id = "713111775e50844a7"  # 替换为你的自定义搜索引擎ID
+api_key = ""  # 替换为你的API密钥
+cse_id = ""  # 替换为你的自定义搜索引擎ID
 def google_search(query, api_key, cse_id, **kwargs):
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
